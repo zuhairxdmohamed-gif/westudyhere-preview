@@ -69,7 +69,48 @@ const seoKeywords=[
 'student learning area','complete course library','online courses'
 ].sort((a,b)=>b.length-a.length);
 const keywordPattern=new RegExp('('+seoKeywords.map(k=>k.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\\\const seo=document.getElementById('seoToggle');let seoOn=false;
-seo.addEventListener('click',()=>{seoOn=!seoOn;seo.setAttribute('aria-pressed',String(seoOn));seo.textContent='SEO REVIEW MODE: '+(seoOn?'ON':'OFF');document.querySelectorAll('.seoMark').forEach(e=>e.classList.remove('seoMark'));if(seoOn){document.querySelectorAll('h1,h2,p,a').forEach(el=>{if(/AutoCAD|Revit|BIM|architecture|drafting|online course/i.test(el.textContent)){el.innerHTML=el.innerHTML.replace(/(Online AutoCAD and Revit courses|AutoCAD course Sri Lanka|Revit course Sri Lanka|AutoCAD tutorials|Revit tutorials|What is BIM|architecture software courses)/gi,'<mark class="seoMark">$1</mark>')}})}});')).join('|')+')','gi');
+const seoKeywords=[
+'Online AutoCAD and Revit courses','AutoCAD course Sri Lanka','Revit course Sri Lanka',
+'architecture software courses','AutoCAD and Revit course bundle','AutoCAD tutorials',
+'Revit tutorials','What is BIM','AutoCAD and Revit','AutoCAD','Revit','BIM',
+'architectural drafting','3D modelling','BIM workflows','technical drawing',
+'building modelling','CAD fundamentals','floor plans','dimensions','elevations',
+'drawing setup','commands','coordinates','layers','file organisation',
+'Revit modelling','documentation','model information','on-demand video lessons',
+'student learning area','complete course library','online courses'
+].sort((a,b)=>b.length-a.length);
+const escapedKeywords=seoKeywords.map(k=>k.replace(/[.*+?^${}()|[\\]\\\\]/g,'\\\\const seo=document.getElementById('seoToggle');let seoOn=false;
+seo.addEventListener('click',()=>{seoOn=!seoOn;seo.setAttribute('aria-pressed',String(seoOn));seo.textContent='SEO REVIEW MODE: '+(seoOn?'ON':'OFF');document.querySelectorAll('.seoMark').forEach(e=>e.classList.remove('seoMark'));if(seoOn){document.querySelectorAll('h1,h2,p,a').forEach(el=>{if(/AutoCAD|Revit|BIM|architecture|drafting|online course/i.test(el.textContent)){el.innerHTML=el.innerHTML.replace(/(Online AutoCAD and Revit courses|AutoCAD course Sri Lanka|Revit course Sri Lanka|AutoCAD tutorials|Revit tutorials|What is BIM|architecture software courses)/gi,'<mark class="seoMark">$1</mark>')}})}});'));
+const keywordPattern=new RegExp('('+escapedKeywords.join('|')+')','gi');
+function markSeoKeywords(){
+ const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{
+  acceptNode(node){
+   if(!node.nodeValue.trim()||node.parentElement.closest('script,style,button,mark,.seoToolbar'))return NodeFilter.FILTER_REJECT;
+   return NodeFilter.FILTER_ACCEPT;
+  }
+ });
+ const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+ nodes.forEach(node=>{
+  const value=node.nodeValue;keywordPattern.lastIndex=0;
+  if(!keywordPattern.test(value))return;
+  keywordPattern.lastIndex=0;const fragment=document.createDocumentFragment();let last=0;let match;
+  while((match=keywordPattern.exec(value))!==null){
+   fragment.append(document.createTextNode(value.slice(last,match.index)));
+   const mark=document.createElement('mark');mark.className='seoMark';mark.textContent=match[0];fragment.append(mark);
+   last=match.index+match[0].length;
+  }
+  fragment.append(document.createTextNode(value.slice(last)));node.parentNode.replaceChild(fragment,node);
+ });
+}
+function unmarkSeoKeywords(){
+ document.querySelectorAll('mark.seoMark').forEach(mark=>mark.replaceWith(document.createTextNode(mark.textContent)));
+}
+seo.textContent='SEO KEYWORDS: SHOW';
+seo.addEventListener('click',()=>{
+ seoOn=!seoOn;seo.setAttribute('aria-pressed',String(seoOn));
+ if(seoOn){markSeoKeywords();seo.textContent='SEO KEYWORDS: HIDE';}
+ else{unmarkSeoKeywords();seo.textContent='SEO KEYWORDS: SHOW';}
+});')).join('|')+')','gi');
 function markSeoKeywords(){
  const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{
   acceptNode(node){
